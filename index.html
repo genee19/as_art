@@ -1,0 +1,47 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <script src="lib/angular.min.js"></script>
+    <link rel="stylesheet" href="styles/normalize.css">
+    <link rel="stylesheet" href="styles/main.css">
+  </head>
+  <body ng-app="asArtApp">
+    <!--[if lt IE 7]>
+      <p>You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+    <div class="container">
+
+      <div ng-controller="GameCtrl">
+        <form name="new_game_parameters" ng-show="(!game)||(game.finished)" class="widget">
+          <h2>New game</h2>
+          <p><label>Game type: <select ng-model="new_game.type" ng-options="type for type in game_types" required></select></label></p>
+          <p><label>Board size: <input type="number" ng-model="new_game.size" min="3" max="20" required></label></p>
+          <input type="submit" value="New Game" ng-disabled="new_game_parameters.$invalid" ng-click="create_new_game()">
+        </form>
+
+        <div ng-show="game" class="widget">
+          <table class="game_grid">
+            <tr ng-repeat="(x, grid_row) in game.board.grid track by $index">
+              <td ng-repeat="(y, cell) in grid_row track by $index" ng-click="local_player_move(x, y)">{{cell||"&nbsp;"}}</td>
+            </tr>
+          </table>
+        </div>
+        <div ng-if="game.finished" class="widget">
+          <p>Game over! <span ng-if="game.winner">{{game.winner}} wins.</span></p>
+        </div>
+      </div>
+
+      
+      <div class="footer">  
+        </div>
+    </div>  
+      <script src="scripts/app.js"></script>
+      <script src="scripts/controllers/game.js"></script>
+</body>
+</html>
