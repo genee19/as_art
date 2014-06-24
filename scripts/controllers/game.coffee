@@ -1,4 +1,5 @@
 getRandomInt = (min, max)->Math.floor(Math.random() * (max - min + 1)) + min
+object_keys = (object)-> key for own key of object
 
 class Board
   empty_grid = (size)-> new Array(size) for [0...size]
@@ -91,11 +92,78 @@ class AIPlayerChaosMonkey extends Player
 
     result
 
+class AIPlayerMinMax extends Player
+  decide_move: (board_grid)->
+    size = board_grid.length
+    players = {}
+
+    possible_moves = []
+    for row, i in board_grid
+      for item, k in row 
+        if not item #an empty field
+          possible_moves.push [i,k]
+        else if item isnt @symbol 
+          players[item] = true
+
+    players = object_keys(players)
+
+    players.push @symbol
+
+    analyze_vector_as = (symbol, start_x, start_y, dx, dy)->
+      distance = 0
+      result = 0
+
+      while distance < size
+        x = start_x + dx * distance
+        y = start_y + dy * distance
+        
+        if not board_grid[x][y]
+          result +=1
+        else if board_grid[x][y] is symbol
+          result +=3
+        else
+          return 0
+
+        distance++  
+
+      if result == ((size-1) * 3 + 1) # this vector is potential win, i.e. size-1 items were found
+        result *= 3
+      
+
+      result  
+
+    analyze_point_as = (symbol, x, y) ->
+      result = 0
+      result += analyze_vector_as(symbol, 0, y, 1, 0)
+      result += analyze_vector_as(symbol, x, 0, 0, 1)
+      if x == y
+        result += analyze_vector_as(symbol, 0, 0, 1, 1)
+      if (x + y) == (size - 1)
+        result += analyze_vector_as(symbol, size-1, 0, -1, 1)
+
+      result
+
+    analyze_point = (x, y) ->
+      result = 0
+      for symbol in players
+        result = Math.max result, analyze_point_as(symbol, x, y)
+
+      result
+
+    max_value = -1    
+    for move in possible_moves
+      if (value = analyze_point(move[0], move[1])) > max_value
+        [@x, @y] = move
+        max_value = value
+
+    @attempt_move()
+
 class Game
 
   @possible_types: [
     'hotseat'
     'you vs chaos'
+    'you vs pc'
   ]
   
   @possible_players: "xo"
@@ -142,6 +210,11 @@ class Game
         while available_symbols.length > 0
           @players.push(new AIPlayerChaosMonkey(next_random_symbol(), move_handler))
 
+      when 'you vs pc'
+        @players.push(new LocalPlayer(next_random_symbol(), move_handler))
+        while available_symbols.length > 0
+          @players.push(new AIPlayerMinMax(next_random_symbol(), move_handler))
+          
 
     @start_game()
 
