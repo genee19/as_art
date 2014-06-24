@@ -199,7 +199,7 @@ angular.module('asArtApp')
 
     $scope.create_new_game = ()->
       $scope.game = new Game $scope.new_game.size, $scope.new_game.type
-      $scope.onmoveaccepted = ()->
+      $scope.game.onmoveaccepted = ()->
         $scope.$apply()
 
     $scope.local_player_move = (x, y)->
