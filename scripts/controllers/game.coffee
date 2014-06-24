@@ -98,7 +98,6 @@ class Game
     'you vs chaos'
   ]
   
-  @possible_players: "⃝╳"
   @possible_players: "xo"
 
   constructor: (board_size, game_type)->
