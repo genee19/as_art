@@ -99,6 +99,7 @@ class Game
   ]
   
   @possible_players: "⃝╳"
+  @possible_players: "xo"
 
   constructor: (board_size, game_type)->
     throw Error "game_type must be one of" + Game.possible_types.join(', ') unless game_type in Game.possible_types
